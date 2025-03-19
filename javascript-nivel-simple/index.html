@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nivelacion</title>
+</head>
+<body>
+    <h1> Caja de texto </h1>
+    <input type="text" id="box"><br/>
+    <button id="randomColor"> Tocar </button>
+</body>
+    <script>
+        const box = document.getElementById("box");
+        const randomColor = document.getElementById("randomColor");
+
+        box.addEventListener("keydown", (e) => {
+            if(e.key === "Enter") {
+                alert(`${box.value}`);
+            }
+            console.log("toque")
+        });
+
+        const colors = [
+            { background: "white", color: "black" },
+            { background: "black", color: "white" },
+            { background: "lightblue", color: "red" },
+        ];
+
+        let index = 0;
+
+        randomColor.addEventListener("click", () => {
+            const { background, color } = colors[index];
+            box.style.backgroundColor = background;
+            box.style.color = color;
+
+            if(index < colors.length - 1) {
+                return index++;
+            }
+
+           index = 0;
+
+        })
+
+
+    </script>
+</html>
