@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suma de Matrices</title>
+</head>
+<body>
+    <h1>Suma de Matrices</h1>
+    <div>
+        <label for="rows">Filas:</label>
+        <input type="number" id="rows" min="1">
+        <label for="cols">Columnas:</label>
+        <input type="number" id="cols" min="1">
+    </div>
+    <button id="createMatrices">Crear Matrices</button>
+
+    <div id="matricesContainer"></div>
+
+    <button id="sumMatrices">Sumar Matrices</button>
+
+    <h2>Resultado:</h2>
+    <pre id="result"></pre>
+
+    <script>
+        document.getElementById('createMatrices').addEventListener('click', function() {
+            const rows = parseInt(document.getElementById('rows').value);
+            const cols = parseInt(document.getElementById('cols').value);
+
+            if (!rows || !cols) {
+                alert("Por favor, ingresa valores válidos para las filas y columnas.");
+                return;
+            }
+
+            const matricesContainer = document.getElementById('matricesContainer');
+            matricesContainer.innerHTML = '';
+
+            matricesContainer.innerHTML += '<h3>Matriz 1</h3>';
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    matricesContainer.innerHTML += `<input type="number" class="matrix1" data-row="${i}" data-col="${j}">`;
+                }
+                matricesContainer.innerHTML += '<br>';
+            }
+
+            matricesContainer.innerHTML += '<h3>Matriz 2</h3>';
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    matricesContainer.innerHTML += `<input type="number" class="matrix2" data-row="${i}" data-col="${j}">`;
+                }
+                matricesContainer.innerHTML += '<br>';
+            }
+        });
+
+        document.getElementById('sumMatrices').addEventListener('click', async function() {
+            const matrix1 = Array.from(document.querySelectorAll('.matrix1')).map(input => parseFloat(input.value));
+            const matrix2 = Array.from(document.querySelectorAll('.matrix2')).map(input => parseFloat(input.value));
+
+            const rows = parseInt(document.getElementById('rows').value);
+            const cols = parseInt(document.getElementById('cols').value);
+
+            if (matrix1.includes(NaN) || matrix2.includes(NaN)) {
+                alert("Por favor, asegúrate de que todos los campos estén llenos y contengan números.");
+                return;
+            }
+
+            try {
+                // Realizar una solicitud POST al servidor
+                const response = await fetch('/sum', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ matrix1, rows, cols, matrix2 })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error en el servidor');
+                }
+
+                const result = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                alert('Hubo un problema al realizar la suma: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
