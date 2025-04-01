@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplicación de Matrices</title>
+</head>
+<body>
+    <h1>Multiplicación de Matrices</h1>
+    <label for="rows">Filas:</label>
+    <input type="number" id="rows" min="1">
+    <label for="cols">Columnas:</label>
+    <input type="number" id="cols" min="1">
+    <button onclick="generateMatrixInputs()">Generar Matrices</button>
+    <div id="matrices"></div>
+    <button onclick="multiplyMatrices()">Multiplicar Matrices</button>
+    <div id="result"></div>
+    <script>
+        function generateMatrixInputs() {
+            const rows = parseInt(document.getElementById('rows').value);
+            const cols = parseInt(document.getElementById('cols').value);
+            if (isNaN(rows) || isNaN(cols) || rows < 1 || cols < 1) {
+                alert("Por favor, ingresa valores válidos para filas y columnas.");
+                return;
+            }
+            const matricesDiv = document.getElementById('matrices');
+            matricesDiv.innerHTML = '';
+            ['Matriz 1', 'Matriz 2'].forEach((title, index) => {
+                const matrixDiv = document.createElement('div');
+                matrixDiv.innerHTML = `<h3>${title}</h3>`;
+                for (let i = 0; i < rows; i++) {
+                    for (let j = 0; j < cols; j++) {
+                        const input = document.createElement('input');
+                        input.type = 'number';
+                        input.id = `${index}-${i}-${j}`;
+                        matrixDiv.appendChild(input);
+                    }
+                    matrixDiv.appendChild(document.createElement('br'));
+                }
+                matricesDiv.appendChild(matrixDiv);
+            });
+        }
+
+        function multiplyMatrices() {
+            const rows = parseInt(document.getElementById('rows').value);
+            const cols = parseInt(document.getElementById('cols').value);
+            const matrix1 = [];
+            const matrix2 = [];
+            for (let i = 0; i < rows; i++) {
+                matrix1.push([]);
+                matrix2.push([]);
+                for (let j = 0; j < cols; j++) {
+                    const val1 = parseFloat(document.getElementById(`0-${i}-${j}`).value);
+                    const val2 = parseFloat(document.getElementById(`1-${i}-${j}`).value);
+                    if (isNaN(val1) || isNaN(val2)) {
+                        alert("Por favor, completa todos los campos de las matrices con números válidos.");
+                        return;
+                    }
+                    matrix1[i].push(val1);
+                    matrix2[i].push(val2);
+                }
+            }
+            fetch('/multiply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ matrix1, matrix2 })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(err => { throw new Error(err.detail); });
+                }
+                return res.json();
+            })
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = '<h3>Resultado</h3>';
+                data.result.forEach(row => {
+                    resultDiv.innerHTML += row.join(' ') + '<br>';
+                });
+            })
+            .catch(err => {
+                alert(`Error: ${err.message}`);
+            });
+        }
+    </script>
+</body>
+</html>
